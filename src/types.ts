@@ -2,6 +2,9 @@ export interface Order {
   id: string;
   userId: number;
   chatId: number;
+  userFirstName: string;
+  userLastName?: string;
+  userUsername?: string;
   drink: Drink;
   volume: Volume;
   alternativeMilk?: AlternativeMilk;
@@ -19,10 +22,10 @@ export interface Drink {
   id: string;
   name: string;
   category: DrinkCategory;
-  basePrice: number;
+  prices: Partial<Record<Volume, number>>;
 }
 
-export type DrinkCategory = "black" | "milk" | "signature" | "non-coffee" | "tea";
+export type DrinkCategory = "black" | "alternative" | "milk" | "signature" | "non-coffee" | "tea";
 
 export type Volume = "0.2" | "0.3" | "0.4";
 
@@ -46,12 +49,11 @@ export interface Timing {
 export interface SessionData {
   currentOrder?: Partial<Order>;
   lastOrder?: Order;
-  orderIdCounter?: number;
 }
 
 export interface BotConfig {
   botToken: string;
-  groupChatId: string;
+  groupChatId: number;
   paymentUrl: string;
 }
 

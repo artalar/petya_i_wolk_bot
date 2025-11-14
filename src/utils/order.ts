@@ -10,7 +10,15 @@ export const calculateTotalPrice = (
 ): number => {
   const log = logger.child({ action: "calculate_price", drinkId: drink.id, volume });
 
-  let totalPrice = drink.basePrice;
+  const basePrice = drink.prices[volume];
+  if (!basePrice) {
+    log.error({ drinkId: drink.id, volume, availablePrices: drink.prices }, "Price not available for this volume");
+    throw new Error(`Напиток "${drink.name}" недоступен в объеме ${volume} л`);
+  }
+
+  let totalPrice = basePrice;
+
+  log.debug({ basePrice, volume }, "Base price for volume");
 
   if (syrup) {
     totalPrice += syrup.price;
@@ -69,6 +77,9 @@ export const createOrder = (
   userId: number,
   chatId: number,
   orderId: string,
+  userFirstName: string,
+  userLastName: string | undefined,
+  userUsername: string | undefined,
   drink: Drink,
   volume: Volume,
   alternativeMilk?: AlternativeMilk,
@@ -89,6 +100,9 @@ export const createOrder = (
     id: orderId,
     userId,
     chatId,
+    userFirstName,
+    userLastName,
+    userUsername,
     drink,
     volume,
     alternativeMilk,

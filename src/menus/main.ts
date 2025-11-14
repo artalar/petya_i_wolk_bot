@@ -20,7 +20,18 @@ export const createMainMenu = (): Menu<MyContext> => {
       log.info("Black coffee category selected");
       await ctx.menu.nav("black-coffee-menu");
     })
-    .text("Молочный кофе", async (ctx) => {
+    .text("Альтернатива", async (ctx) => {
+      const log = logger.child({
+        action: "category_selected",
+        userId: ctx.from?.id,
+        chatId: ctx.chat?.id,
+        category: "alternative",
+      });
+      log.info("Alternative category selected");
+      await ctx.menu.nav("alternative-menu");
+    })
+    .row()
+    .text("О молоком", async (ctx) => {
       const log = logger.child({
         action: "category_selected",
         userId: ctx.from?.id,
@@ -30,8 +41,7 @@ export const createMainMenu = (): Menu<MyContext> => {
       log.info("Milk coffee category selected");
       await ctx.menu.nav("milk-coffee-menu");
     })
-    .row()
-    .text("Авторское 0.1", async (ctx) => {
+    .text("Отвешат", async (ctx) => {
       const log = logger.child({
         action: "category_selected",
         userId: ctx.from?.id,
@@ -41,6 +51,7 @@ export const createMainMenu = (): Menu<MyContext> => {
       log.info("Signature category selected");
       await ctx.menu.nav("signature-menu");
     })
+    .row()
     .text("Не кофе", async (ctx) => {
       const log = logger.child({
         action: "category_selected",
@@ -51,8 +62,7 @@ export const createMainMenu = (): Menu<MyContext> => {
       log.info("Non-coffee category selected");
       await ctx.menu.nav("non-coffee-menu");
     })
-    .row()
-    .text("Чай 0.3", async (ctx) => {
+    .text("Чай", async (ctx) => {
       const log = logger.child({
         action: "category_selected",
         userId: ctx.from?.id,
@@ -64,6 +74,7 @@ export const createMainMenu = (): Menu<MyContext> => {
     });
 
   mainMenu.register(drinkMenus.black);
+  mainMenu.register(drinkMenus.alternative);
   mainMenu.register(drinkMenus.milk);
   mainMenu.register(drinkMenus.signature);
   mainMenu.register(drinkMenus.nonCoffee);

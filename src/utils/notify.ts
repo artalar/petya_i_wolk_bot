@@ -38,7 +38,19 @@ export const sendOrderToGroup = async (api: Api, order: Order): Promise<void> =>
 const formatOrderForGroup = (order: Order): string => {
   const parts: string[] = [];
   parts.push(`<b>Новый заказ #${order.id}</b>\n`);
-  parts.push(`👤 Пользователь: ${order.userId}`);
+  
+  const userParts: string[] = [];
+  
+  const fullName = [order.userFirstName, order.userLastName].filter(Boolean).join(" ");
+  userParts.push(fullName);
+  
+  if (order.userUsername) {
+    userParts.push(`@${order.userUsername}`);
+  }
+  
+  userParts.push(`(ID: ${order.userId})`);
+  
+  parts.push(`👤 Пользователь: ${userParts.join(" ")}`);
   parts.push(`☕ Напиток: ${order.drink.name}`);
   parts.push(`🥛 Объем: ${order.volume} л`);
 

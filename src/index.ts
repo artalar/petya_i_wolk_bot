@@ -6,18 +6,25 @@ import { loggingMiddleware } from "./logger/middleware";
 import { MyContext, Session } from "./types/context";
 import { createMainMenu } from "./menus/main";
 import { orderConversation } from "./conversations/order";
-import { InlineKeyboard as GrammyInlineKeyboard } from "grammy";
+import { InlineKeyboard } from "grammy";
 import { TIMINGS } from "./config/menu";
 import { sendOrderToGroup, notifyOrderCreated } from "./utils/notify";
+import { groupMessageLogger } from "./middleware/groupMessageLogger";
 
 const bot = new Bot<MyContext>(botConfig.botToken);
 
 const initialSession = (): Session => ({
   currentOrder: undefined,
   lastOrder: undefined,
-  orderIdCounter: 0,
 });
 
+// TODO: Replace MemorySessionStorage with persistent storage for production
+// MemorySessionStorage loses all data on bot restart. Users will lose their
+// in-progress orders and order history. Consider using:
+// - @grammyjs/storage-redis for Redis
+// - @grammyjs/storage-file for file-based storage (simple but not scalable)
+// - @grammyjs/storage-mongodb for MongoDB
+// - Custom adapter for PostgreSQL/MySQL
 bot.use(
   session({
     initial: initialSession,
@@ -27,12 +34,17 @@ bot.use(
 
 bot.use(conversations());
 
+bot.use(createConversation(orderConversation, "order-conversation"));
+
 bot.use(loggingMiddleware);
 
 const mainMenu = createMainMenu();
+
 bot.use(mainMenu);
 
-bot.use(createConversation(orderConversation));
+if (process.env.NODE_ENV === "development") {
+  bot.on("message", groupMessageLogger);
+}
 
 bot.command("start", async (ctx) => {
   const log = logger.child({
@@ -98,28 +110,49 @@ bot.callbackQuery(/^check_payment:(.+)$/, async (ctx) => {
   const orderId = ctx.match[1];
   log.info({ orderId }, "Payment check requested");
 
-  await ctx.answerCallbackQuery({
-    text: "Проверяем оплату...",
-  });
+  // TODO: Implement actual payment verification
+  // Currently, this handler always assumes payment is successful without checking
+  // with the payment provider API. This is a CRITICAL SECURITY ISSUE.
+  // Integrate with your payment provider (e.g., Stripe, YooKassa, etc.) to verify
+  // that the payment for this order ID was actually completed before proceeding.
 
   const session = ctx.session;
   const lastOrder = session.lastOrder;
 
   if (!lastOrder || lastOrder.id !== orderId) {
     log.warn({ orderId, hasLastOrder: !!lastOrder }, "Order not found in session");
+    await ctx.answerCallbackQuery({
+      text: "Ошибка: заказ не найден",
+    });
     await ctx.reply("Ошибка: заказ не найден. Пожалуйста, создайте новый заказ.");
     return;
   }
 
   if (!ctx.from || !ctx.chat) {
     log.warn("Missing user or chat information");
+    await ctx.answerCallbackQuery({
+      text: "Ошибка системы",
+    });
     await ctx.reply("Ошибка: не удалось определить пользователя");
     return;
   }
 
-  log.info({ orderId: lastOrder.id }, "Payment check successful, showing timing selection");
+  const isDevelopment = process.env.NODE_ENV === "development";
 
-  const timingKeyboard = new GrammyInlineKeyboard();
+  if (isDevelopment) {
+    log.warn({ orderId: lastOrder.id }, "DEV MODE: Auto-approving payment without verification");
+    await ctx.answerCallbackQuery({
+      text: "✅ [DEV] Оплата подтверждена автоматически",
+    });
+  } else {
+    log.info({ orderId: lastOrder.id }, "Payment check successful, showing timing selection");
+    await ctx.answerCallbackQuery({
+      text: "Оплата подтверждена!",
+    });
+  }
+
+
+  const timingKeyboard = new InlineKeyboard();
   TIMINGS.forEach((timing) => {
     timingKeyboard.text(timing.label, `timing:${lastOrder.id}:${timing.minutes}`).row();
   });
@@ -177,6 +210,7 @@ bot.callbackQuery(/^timing:(.+):(\d+)$/, async (ctx) => {
     await sendOrderToGroup(bot.api, lastOrder);
     await notifyOrderCreated(bot.api, ctx.chat.id, lastOrder.id);
     await ctx.reply("Супер! Ждем ⏰");
+    ctx.session.lastOrder = undefined;
   } catch (error) {
     log.error(
       {
@@ -187,8 +221,6 @@ bot.callbackQuery(/^timing:(.+):(\d+)$/, async (ctx) => {
     );
     await ctx.reply("Ошибка при отправке заказа. Пожалуйста, попробуйте еще раз.");
   }
-
-  ctx.session.lastOrder = undefined;
 });
 
 bot.callbackQuery(/^cancel_order:(.+)$/, async (ctx) => {
@@ -214,18 +246,6 @@ bot.callbackQuery(/^cancel_order:(.+)$/, async (ctx) => {
   log.info({ orderId }, "Order cancelled");
 
   await ctx.reply("Заказ отменен. Вы можете начать новый заказ через /start");
-});
-
-bot.on("callback_query:data", async (ctx) => {
-  logger.debug(
-    {
-      callbackQueryId: ctx.callbackQuery.id,
-      data: ctx.callbackQuery.data,
-      userId: ctx.from?.id,
-    },
-    "Unhandled callback query"
-  );
-  await ctx.answerCallbackQuery();
 });
 
 bot.catch((err) => {
