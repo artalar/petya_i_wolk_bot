@@ -210,6 +210,8 @@ export async function handleOrderCallback(ctx: Context) {
       order.step = 9;
     }
   } else if (data.startsWith("time_")) {
+    const time = data.replace("time_", "");
+    order.time = time;
     order.step = 10;
   }
 
@@ -365,6 +367,7 @@ function buildOrderSummary(order: any): string {
 
   if (order.milk) summary += `🥛 Молоко: ${order.milk}\n`;
   if (order.syrup) summary += `🍬 Сироп: ${order.syrup}\n`;
+  if (order.time) summary += `⏰ Готовность: через ${order.time} мин\n`;
 
   if (order.price > 0) summary += `\n💰 *Итого: ${order.price}₽*`;
 

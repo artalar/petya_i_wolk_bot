@@ -1,12 +1,3 @@
 {
-	"orderMessageId": 139,
-	"currentOrder": {
-		"step": 9,
-		"additions": [],
-		"price": 260,
-		"messageId": 199,
-		"categoryName": "Черный кофе",
-		"itemCode": "espresso_tonic",
-		"volume": "0.3"
-	}
+	"orderMessageId": 139
 }

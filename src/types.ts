@@ -52,6 +52,7 @@ export interface SessionData {
     price: number;
     paymentId?: string;
     paymentUrl?: string;
+    time?: string;
   };
   // To prevent spamming commands
   lastCommand?: number;
