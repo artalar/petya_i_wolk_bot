@@ -303,10 +303,10 @@ async function updateOrderMessage(ctx: Context, isNew = false) {
       break;
 
     case 9: { // Time
-      stepMessage = "Отлично, заказ сформирован! 👌 Уже начинаем готовить?";
+      stepMessage = "Отлично, заказ почти сформирован! 👌 Вот время через которое мы сможем его приготовить:";
       const settings = await getSettings();
       settings.availableTimes.forEach((time) => {
-        keyboard.text(`Буду через ${time} минут`, `time_${time}`).row();
+        keyboard.text(`Через ${time} минут`, `time_${time}`).row();
       });
       keyboard.row().text("Назад", "back");
       break;
