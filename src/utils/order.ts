@@ -1,6 +1,13 @@
 import { Order, Drink, Volume, AlternativeMilk, Syrup } from "../types";
 import { botConfig } from "../config/bot";
 import { logger } from "../logger";
+import { yooKassaService } from "../services/yookassa";
+import { VOLUMES } from "../config/menu";
+
+export const formatVolume = (volume: Volume): string => {
+  const volumeConfig = VOLUMES.find(v => v.value === volume);
+  return volumeConfig ? volumeConfig.label : `${volume} л`;
+};
 
 export const calculateTotalPrice = (
   drink: Drink,
@@ -13,7 +20,7 @@ export const calculateTotalPrice = (
   const basePrice = drink.prices[volume];
   if (!basePrice) {
     log.error({ drinkId: drink.id, volume, availablePrices: drink.prices }, "Price not available for this volume");
-    throw new Error(`Напиток "${drink.name}" недоступен в объеме ${volume} л`);
+    throw new Error(`Напиток "${drink.name}" недоступен в объеме ${formatVolume(volume)}`);
   }
 
   let totalPrice = basePrice;
@@ -37,12 +44,57 @@ export const calculateTotalPrice = (
   return totalPrice;
 };
 
-export const generatePaymentUrl = (orderId: string, totalPrice: number): string => {
-  const log = logger.child({ action: "generate_payment_url", orderId, totalPrice });
+export const createYooKassaPayment = async (
+  orderId: string,
+  totalPrice: number,
+  description: string
+): Promise<{ paymentId: string; paymentUrl: string }> => {
+  const log = logger.child({
+    action: "create_yookassa_payment",
+    orderId,
+    totalPrice,
+  });
 
-  const url = `${botConfig.paymentUrl}?order_id=${orderId}&amount=${totalPrice}`;
-  log.debug({ url: "***" }, "Payment URL generated");
-  return url;
+  if (!yooKassaService.isInitialized()) {
+    log.warn("YooKassa service not initialized, using mock payment URL");
+    const mockPaymentUrl = `https://yookassa.ru/checkout/payments/mock?order_id=${orderId}&amount=${totalPrice}`;
+    return {
+      paymentId: `mock-${orderId}`,
+      paymentUrl: mockPaymentUrl,
+    };
+  }
+
+  try {
+    const payment = await yooKassaService.createPayment({
+      amount: totalPrice,
+      orderId,
+      description,
+      returnUrl: botConfig.paymentReturnUrl,
+    });
+
+    const paymentUrl = yooKassaService.getPaymentUrlFromResponse(payment);
+
+    log.info(
+      {
+        paymentId: payment.id,
+        test: payment.test,
+      },
+      "YooKassa payment created"
+    );
+
+    return {
+      paymentId: payment.id,
+      paymentUrl,
+    };
+  } catch (error) {
+    log.error(
+      {
+        error: error instanceof Error ? error.message : String(error),
+      },
+      "Failed to create YooKassa payment"
+    );
+    throw error;
+  }
 };
 
 export const formatOrderMessage = (order: Order): string => {
@@ -53,7 +105,7 @@ export const formatOrderMessage = (order: Order): string => {
   parts.push("");
   parts.push("Ваш заказ:");
   parts.push(`☕ Напиток: ${order.drink.name}`);
-  parts.push(`🥛 Объем: ${order.volume} л`);
+  parts.push(`🥛 Объем: ${formatVolume(order.volume)}`);
 
   if (order.alternativeMilk) {
     parts.push(`🥛 Альтернативное молоко: ${order.alternativeMilk.name}`);
@@ -65,15 +117,13 @@ export const formatOrderMessage = (order: Order): string => {
 
   parts.push("");
   parts.push(`💰 Итого: ${order.totalPrice}₽`);
-  parts.push("");
-  parts.push("Нажмите кнопку ниже для оплаты:");
 
   const message = parts.join("\n");
   log.debug({ messageLength: message.length }, "Order message formatted");
   return message;
 };
 
-export const createOrder = (
+export const createOrder = async (
   userId: number,
   chatId: number,
   orderId: string,
@@ -82,19 +132,35 @@ export const createOrder = (
   userUsername: string | undefined,
   drink: Drink,
   volume: Volume,
+  paymentMethod: "online" | "cash",
   alternativeMilk?: AlternativeMilk,
   syrup?: Syrup
-): Order => {
+): Promise<Order> => {
   const log = logger.child({
     action: "create_order",
     userId,
     chatId,
     orderId,
     drinkId: drink.id,
+    paymentMethod,
   });
 
   const totalPrice = calculateTotalPrice(drink, volume, alternativeMilk, syrup);
-  const paymentUrl = generatePaymentUrl(orderId, totalPrice);
+
+  const description = `${drink.name} ${formatVolume(volume)}`;
+
+  let paymentId: string | undefined;
+  let paymentUrl: string | undefined;
+
+  if (paymentMethod === "online") {
+    const payment = await createYooKassaPayment(
+      orderId,
+      totalPrice,
+      description
+    );
+    paymentId = payment.paymentId;
+    paymentUrl = payment.paymentUrl;
+  }
 
   const order: Order = {
     id: orderId,
@@ -108,12 +174,14 @@ export const createOrder = (
     alternativeMilk,
     syrup,
     totalPrice,
+    paymentMethod,
     paymentUrl,
+    paymentId,
     status: "pending",
     createdAt: new Date(),
   };
 
-  log.info({ orderId, totalPrice, status: order.status }, "Order created");
+  log.info({ orderId, paymentId, totalPrice, paymentMethod, status: order.status }, "Order created");
   return order;
 };
 

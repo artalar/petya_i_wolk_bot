@@ -10,11 +10,15 @@ export interface Order {
   alternativeMilk?: AlternativeMilk;
   syrup?: Syrup;
   totalPrice: number;
-  paymentUrl: string;
+  paymentMethod: PaymentMethod;
+  paymentUrl?: string;
+  paymentId?: string;
   status: OrderStatus;
   timing?: Timing;
   createdAt: Date;
 }
+
+export type PaymentMethod = "online" | "cash";
 
 export type OrderStatus = "pending" | "paid" | "preparing" | "ready" | "cancelled";
 
@@ -27,7 +31,7 @@ export interface Drink {
 
 export type DrinkCategory = "black" | "alternative" | "milk" | "signature" | "non-coffee" | "tea";
 
-export type Volume = "0.2" | "0.3" | "0.4";
+export type Volume = "0.042" | "0.06" | "0.2" | "0.3" | "0.4";
 
 export interface AlternativeMilk {
   id: string;
@@ -49,11 +53,12 @@ export interface Timing {
 export interface SessionData {
   currentOrder?: Partial<Order>;
   lastOrder?: Order;
+  orderMessageId?: number;
 }
 
 export interface BotConfig {
   botToken: string;
   groupChatId: number;
-  paymentUrl: string;
+  paymentReturnUrl: string;
 }
 

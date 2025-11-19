@@ -27,7 +27,19 @@ const createDrinkSelectionHandler = (drink: Drink) => {
 
     ctx.session.currentOrder.drink = drink;
 
+    if (ctx.callbackQuery?.message?.message_id) {
+      ctx.session.orderMessageId = ctx.callbackQuery.message.message_id;
+      log.debug({ messageId: ctx.session.orderMessageId }, "Saved message ID for order flow");
+    }
+
     log.debug({ drinkId: drink.id }, "Drink saved to session");
+
+    // Check if conversation is already active
+    const activeConversation = await ctx.conversation.active();
+    if (activeConversation["order-conversation"]) {
+        log.warn("Order conversation already active, skipping re-entry");
+        return;
+    }
 
     log.info("Attempting to enter order conversation");
     try {

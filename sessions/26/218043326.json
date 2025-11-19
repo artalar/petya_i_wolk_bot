@@ -1,0 +1,14 @@
+{
+	"currentOrder": {
+		"drink": {
+			"id": "espresso",
+			"name": "Эспрессо 42 мл",
+			"category": "black",
+			"prices": {
+				"0.042": 150
+			}
+		},
+		"volume": "0.042"
+	},
+	"orderMessageId": 127
+}

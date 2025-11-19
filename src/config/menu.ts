@@ -2,11 +2,11 @@ import { Drink, AlternativeMilk, Syrup, Timing, DrinkCategory } from "../types";
 
 export const DRINKS: Record<DrinkCategory, Drink[]> = {
   black: [
-    { id: "espresso", name: "Эспрессо 42 мл", category: "black", prices: { "0.2": 150 } },
+    { id: "espresso", name: "Эспрессо 42 мл", category: "black", prices: { "0.042": 150 } },
     { id: "americano", name: "Американо", category: "black", prices: { "0.2": 180, "0.3": 200, "0.4": 260 } },
-    { id: "filter", name: "Фильтр кофе", category: "black", prices: { "0.2": 170, "0.3": 210, "0.4": 270 } },
-    { id: "espresso-tonic", name: "Эспрессо-тоник", category: "black", prices: { "0.3": 260 } },
-    { id: "bumble", name: "Бамбл", category: "black", prices: { "0.3": 290 } },
+    { id: "espresso-tonic", name: "Эспрессо-тоник 0,3", category: "black", prices: { "0.3": 260 } },
+    { id: "bumble", name: "Бамбл 0,3", category: "black", prices: { "0.3": 290 } },
+    { id: "filter", name: "Фильтр", category: "black", prices: { "0.2": 170, "0.3": 210, "0.4": 270 } },
   ],
   alternative: [
     { id: "v60", name: "Воронка V60", category: "alternative", prices: { "0.3": 240 } },
@@ -17,7 +17,7 @@ export const DRINKS: Record<DrinkCategory, Drink[]> = {
   ],
   milk: [
     { id: "cappuccino", name: "Капучино", category: "milk", prices: { "0.2": 200, "0.3": 240, "0.4": 280 } },
-    { id: "latte", name: "Латте", category: "milk", prices: { "0.3": 260, "0.4": 290 } },
+    { id: "latte", name: "Латте", category: "milk", prices: { "0.3": 250, "0.4": 290 } },
     { id: "flat-white", name: "Флэт уайт", category: "milk", prices: { "0.2": 230 } },
     { id: "raf", name: "Раф", category: "milk", prices: { "0.3": 290 } },
   ],
@@ -27,21 +27,21 @@ export const DRINKS: Record<DrinkCategory, Drink[]> = {
     { id: "peanut-crunch", name: "Арахисовый кранч", category: "signature", prices: { "0.3": 300 } },
   ],
   "non-coffee": [
-    { id: "cocoa-shot", name: "Какао-шот 60 мл", category: "non-coffee", prices: { "0.2": 190 } },
+    { id: "cocoa-shot", name: "Какао-шот 60 мл", category: "non-coffee", prices: { "0.06": 190 } },
     { id: "cocoa", name: "Какао", category: "non-coffee", prices: { "0.2": 200, "0.3": 230, "0.4": 280 } },
     { id: "hot-chocolate", name: "Горячий шоколад", category: "non-coffee", prices: { "0.2": 230, "0.3": 280 } },
     { id: "matcha-latte", name: "Матча-латте", category: "non-coffee", prices: { "0.3": 230, "0.4": 270 } },
   ],
   tea: [
-    { id: "tea-black", name: "Чёрный", category: "tea", prices: {} },
-    { id: "tea-sencha", name: "Сенча", category: "tea", prices: {} },
-    { id: "tea-milk-oolong", name: "Улун молочный", category: "tea", prices: {} },
-    { id: "tea-melon-caramel", name: "Дыня / карамель", category: "tea", prices: {} },
-    { id: "tea-cherry", name: "Вишневый", category: "tea", prices: { "0.2": 180, "0.3": 250 } },
-    { id: "tea-mint", name: "Мятный", category: "tea", prices: {} },
-    { id: "tea-blackcurrant", name: "Черная смородина", category: "tea", prices: {} },
-    { id: "tea-mulled-wine", name: "Глинтвейн", category: "tea", prices: {} },
-    { id: "tea-buckwheat", name: "Гречишный", category: "tea", prices: {} },
+    { id: "tea-black", name: "Черный", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-mint", name: "Мятный", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-milk-oolong", name: "Улун молочный", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-melon-caramel", name: "Дыня/карамель", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-sencha", name: "Сенча", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-cherry", name: "Вишневый", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-blackcurrant", name: "Черная смородина", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-mulled-wine", name: "Глинтвейн", category: "tea", prices: { "0.3": 180 } },
+    { id: "tea-buckwheat", name: "Гречишный", category: "tea", prices: { "0.3": 180 } },
   ],
 };
 
@@ -55,9 +55,17 @@ export const ALTERNATIVE_MILKS: AlternativeMilk[] = [
 ];
 
 export const SYRUPS: Syrup[] = [
-  { id: "syrup", name: "Сироп", price: 40 },
-  { id: "thyme", name: "Чабрец", price: 30 },
-  { id: "lemon", name: "Лимон", price: 20 },
+  { id: "coconut", name: "Кокос", price: 40 },
+  { id: "double-salted-caramel", name: "Двойная соленая карамель", price: 40 },
+  { id: "mint-eucalyptus", name: "Мята с эвкалиптом", price: 40 },
+  { id: "double-caramel", name: "Двойная карамель", price: 40 },
+  { id: "cherry", name: "Вишня", price: 40 },
+  { id: "irish-cream", name: "Ирландский крем", price: 40 },
+  { id: "red-orange", name: "Красный апельсин", price: 40 },
+  { id: "hazelnut", name: "Лесной орех", price: 40 },
+  { id: "raspberry", name: "Малина", price: 40 },
+  { id: "vanilla", name: "Ваниль", price: 40 },
+  { id: "popcorn", name: "Попкорн", price: 40 },
 ];
 
 export const TIMINGS: Timing[] = [
@@ -66,7 +74,9 @@ export const TIMINGS: Timing[] = [
   { minutes: 15, label: "Буду через 15 минут" },
 ];
 
-export const VOLUMES: Array<{ value: "0.2" | "0.3" | "0.4"; label: string }> = [
+export const VOLUMES: Array<{ value: "0.042" | "0.06" | "0.2" | "0.3" | "0.4"; label: string }> = [
+  { value: "0.042", label: "42 мл" },
+  { value: "0.06", label: "60 мл" },
   { value: "0.2", label: "0,2 л" },
   { value: "0.3", label: "0,3 л" },
   { value: "0.4", label: "0,4 л" },

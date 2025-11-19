@@ -67,6 +67,7 @@ const formatOrderForGroup = (order: Order): string => {
   }
 
   parts.push(`\n💰 Итого: ${order.totalPrice}₽`);
+  parts.push(`💳 Оплата: ${order.paymentMethod === "online" ? "Онлайн" : "На кассе"}`);
   parts.push(`📅 Создан: ${order.createdAt.toLocaleString("ru-RU")}`);
 
   return parts.join("\n");
@@ -75,21 +76,22 @@ const formatOrderForGroup = (order: Order): string => {
 export const notifyOrderCreated = async (
   api: Api,
   chatId: number,
-  orderId: string
+  orderId: string,
+  paymentMethod: "online" | "cash"
 ): Promise<void> => {
   logWithContext(
     "info",
     "Notifying user about order creation",
-    { chatId, orderId, action: "notify_order_created" }
+    { chatId, orderId, paymentMethod, action: "notify_order_created" }
   );
+
+  const message = paymentMethod === "online"
+    ? `✅ Заказ #${orderId} успешно создан! Мы получили ваш заказ и начнем готовить.`
+    : `✅ Заказ #${orderId} успешно создан! Мы получили ваш заказ и начинаем готовить. Оплатите на кассе при получении.`;
 
   try {
     await apiCallLogger(
-      () =>
-        api.sendMessage(
-          chatId,
-          `✅ Заказ #${orderId} успешно создан! Мы получили ваш заказ и начнем готовить после оплаты.`
-        ),
+      () => api.sendMessage(chatId, message),
       "sendMessage",
       { chatId }
     );

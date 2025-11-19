@@ -6,7 +6,9 @@ dotenv.config();
 
 const botToken = process.env.BOT_TOKEN;
 const groupChatIdString = process.env.GROUP_CHAT_ID;
-const paymentUrl = process.env.PAYMENT_URL;
+const yooKassaShopId = process.env.YOOKASSA_SHOP_ID;
+const yooKassaSecretKey = process.env.YOOKASSA_SECRET_KEY;
+const paymentReturnUrl = process.env.PAYMENT_RETURN_URL;
 
 if (!botToken) {
   logger.fatal("BOT_TOKEN environment variable is not set");
@@ -26,31 +28,24 @@ if (isNaN(groupChatId)) {
 
 const isDevelopment = process.env.NODE_ENV === "development";
 
-let finalPaymentUrl: string;
-
-if (isDevelopment) {
-  finalPaymentUrl = "https://example.com/mock-payment";
-  logger.warn("Development mode: using mock payment URL");
-} else {
-  if (!paymentUrl) {
-    logger.fatal("PAYMENT_URL environment variable is not set");
-    throw new Error("PAYMENT_URL environment variable is not set");
-  }
-  finalPaymentUrl = paymentUrl;
-}
+const finalPaymentReturnUrl = paymentReturnUrl || "https://t.me/your_bot";
 
 export const botConfig: BotConfig = {
   botToken,
   groupChatId,
-  paymentUrl: finalPaymentUrl,
+  paymentReturnUrl: finalPaymentReturnUrl,
+};
+
+export const yooKassaConfig = {
+  shopId: yooKassaShopId,
+  secretKey: yooKassaSecretKey,
 };
 
 if (isDevelopment) {
   logger.warn(
-    { groupChatId, paymentUrl: finalPaymentUrl },
-    "Bot running in DEVELOPMENT mode with mock payment URL"
+    { groupChatId },
+    "Bot running in DEVELOPMENT mode"
   );
 } else {
-  logger.info({ groupChatId, paymentUrl: "***" }, "Bot configuration loaded");
+  logger.info({ groupChatId }, "Bot configuration loaded");
 }
-
