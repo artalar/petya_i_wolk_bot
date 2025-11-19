@@ -1,5 +1,5 @@
 {
-  "name": "petya-i-wolk-bot",
+  "name": "petya-and-wolk-bot",
   "version": "1.0.0",
   "description": "Telegram bot built with Grammy.dev and TypeScript",
   "main": "dist/index.js",

@@ -1,0 +1,13 @@
+{
+  "lastResetDate": "2025-11-19",
+  "currentId": 8,
+  "settings": {
+    "isBotActive": true,
+    "isOnlinePaymentActive": false,
+    "availableTimes": [
+      5,
+      10,
+      15
+    ]
+  }
+}

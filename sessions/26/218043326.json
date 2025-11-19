@@ -1,14 +1,17 @@
 {
 	"currentOrder": {
-		"drink": {
-			"id": "espresso",
-			"name": "Эспрессо 42 мл",
-			"category": "black",
-			"prices": {
-				"0.042": 150
-			}
-		},
-		"volume": "0.042"
+		"step": 9,
+		"additions": [
+			"Молоко Банановое",
+			"Сироп Малина"
+		],
+		"price": 390,
+		"messageId": 189,
+		"categoryName": "Молочный кофе",
+		"itemCode": "raf",
+		"volume": "0.3",
+		"milk": "Банановое",
+		"syrup": "Малина"
 	},
 	"orderMessageId": 127
 }
