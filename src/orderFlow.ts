@@ -94,10 +94,6 @@ export async function handleOrderCallback(ctx: Context) {
           order.syrup = undefined;
         }
         break;
-
-      case 9: // Time -> Payment (8)
-        order.step = 8;
-        break;
     }
     await updateOrderMessage(ctx);
     return;
@@ -209,15 +205,11 @@ export async function handleOrderCallback(ctx: Context) {
     } else {
       order.step = 9;
     }
-  } else if (data.startsWith("time_")) {
-    const time = data.replace("time_", "");
-    order.time = time;
-    order.step = 10;
   }
 
   await updateOrderMessage(ctx);
 
-  if (order.step === 10) {
+  if (order.step === 9) {
     await finalizeOrder(ctx);
   }
 }
@@ -304,17 +296,7 @@ async function updateOrderMessage(ctx: Context, isNew = false) {
       keyboard.row().text("Назад", "back");
       break;
 
-    case 9: { // Time
-      stepMessage = "Отлично, заказ почти сформирован! 👌 Вот время через которое мы сможем его приготовить:";
-      const settings = await getSettings();
-      settings.availableTimes.forEach((time) => {
-        keyboard.text(`Через ${time} минут`, `time_${time}`).row();
-      });
-      keyboard.row().text("Назад", "back");
-      break;
-    }
-
-    case 10: // Final
+    case 9: // Final
       stepMessage = "Супер! Ждем 👍";
       // No buttons
       break;
@@ -367,7 +349,7 @@ function buildOrderSummary(order: any): string {
 
   if (order.milk) summary += `🥛 Молоко: ${order.milk}\n`;
   if (order.syrup) summary += `🍬 Сироп: ${order.syrup}\n`;
-  if (order.time) summary += `⏰ Готовность: через ${order.time} мин\n`;
+  summary += `⏰ Готовность: в течение 5 минут\n`;
 
   if (order.price > 0) summary += `\n💰 *Итого: ${order.price}₽*`;
 
@@ -388,9 +370,11 @@ async function finalizeOrder(ctx: Context) {
   // Send to Admin Group
   if (config.adminGroupId) {
     try {
+      const adminKeyboard = new InlineKeyboard().text("⚠️ Высокая загрузка", `high_load_${ctx.from?.id}`);
       await ctx.api.sendMessage(
         config.adminGroupId,
-        `🔔 Новый заказ #${orderId}!\n\n${orderText}`
+        `🔔 Новый заказ #${orderId}!\n\n${orderText}`,
+        { reply_markup: adminKeyboard }
       );
     } catch (e) {
       logger.error({ err: e }, "Failed to send order to admin group");

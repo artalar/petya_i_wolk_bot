@@ -43,8 +43,25 @@ bot.command('admin', showAdminPanel);
 
 // Callbacks
 bot.on('callback_query:data', async (ctx, next) => {
-    if (ctx.callbackQuery.data.startsWith('admin_')) {
+    const data = ctx.callbackQuery.data;
+    if (data.startsWith('admin_')) {
         return handleAdminCallback(ctx);
+    }
+    if (data.startsWith('high_load_')) {
+        const userId = Number(data.replace('high_load_', ''));
+        if (!userId) {
+             await ctx.answerCallbackQuery("Ошибка: ID пользователя не найден.");
+             return;
+        }
+        
+        try {
+            await ctx.api.sendMessage(userId, "Сейчас у нас высокая загрузка, но мы постараемся приготовить ваш заказ в течении 10 минут.");
+            await ctx.answerCallbackQuery("Уведомление отправлено пользователю.");
+        } catch (e) {
+            logger.error({ err: e }, "Failed to send high load notification");
+            await ctx.answerCallbackQuery("Ошибка отправки (бот заблокирован?).");
+        }
+        return;
     }
     return next();
 });

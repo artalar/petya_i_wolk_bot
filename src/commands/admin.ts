@@ -39,13 +39,6 @@ export async function handleAdminCallback(ctx: Context) {
         newSettings.isBotActive = !settings.isBotActive;
     } else if (action === 'toggle_payment') {
         newSettings.isOnlinePaymentActive = !settings.isOnlinePaymentActive;
-    } else if (action.startsWith('toggle_time_')) {
-        const time = parseInt(action.replace('toggle_time_', ''), 10);
-        if (settings.availableTimes.includes(time)) {
-            newSettings.availableTimes = settings.availableTimes.filter(t => t !== time);
-        } else {
-            newSettings.availableTimes = [...settings.availableTimes, time].sort((a, b) => a - b);
-        }
     }
 
     await updateSettings(newSettings);
@@ -56,7 +49,7 @@ export async function handleAdminCallback(ctx: Context) {
     } catch (e) {
         // Ignore if not changed
     }
-    await ctx.answerCallbackQuery();
+    return ctx.answerCallbackQuery();
 }
 
 function buildAdminKeyboard(settings: { isBotActive: boolean; isOnlinePaymentActive: boolean; availableTimes: number[] }) {
@@ -69,16 +62,6 @@ function buildAdminKeyboard(settings: { isBotActive: boolean; isOnlinePaymentAct
     // Payment button
     const paymentText = settings.isOnlinePaymentActive ? "🟢 Оплата онлайн вкл" : "🔴 Оплата онлайн выкл";
     keyboard.text(paymentText, "admin_toggle_payment").row();
-
-    // Time buttons
-    keyboard.text("⏱ Время приготовления:", "noop").row();
-    
-    [5, 10, 15].forEach(time => {
-        const isAvailable = settings.availableTimes.includes(time);
-        const text = isAvailable ? `✅ ${time} мин` : `❌ ${time} мин`;
-        keyboard.text(text, `admin_toggle_time_${time}`);
-    });
-    keyboard.row();
 
     return keyboard;
 }
