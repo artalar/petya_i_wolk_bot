@@ -3,6 +3,7 @@ dotenv.config();
 
 export const config = {
   botToken: process.env.BOT_TOKEN || '',
+  botName: process.env.BOT_NAME || '',
   yookassaShopId: process.env.YOOKASSA_SHOP_ID || '',
   yookassaSecretKey: process.env.YOOKASSA_SECRET_KEY || '',
   adminGroupId: process.env.ADMIN_GROUP_ID || '',

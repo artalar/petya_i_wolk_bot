@@ -49,13 +49,18 @@ async function writeDb(data: DBData): Promise<void> {
     await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2));
 }
 
+function getMoscowDateString(): string {
+  const moscowTime = new Date().toLocaleString('en-CA', { timeZone: 'Europe/Moscow' });
+  return moscowTime.split(',')[0];
+}
+
 export async function getNextOrderId(): Promise<number> {
   const data = await readDb();
 
-  const today = new Date().toISOString().split('T')[0];
+  const todayMoscow = getMoscowDateString();
 
-  if (data.lastResetDate !== today) {
-    data.lastResetDate = today;
+  if (data.lastResetDate !== todayMoscow) {
+    data.lastResetDate = todayMoscow;
     data.currentId = 1;
   } else {
     data.currentId += 1;

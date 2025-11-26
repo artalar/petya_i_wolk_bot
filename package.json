@@ -28,7 +28,7 @@
     "grammy": "^1.38.3",
     "pino": "^10.1.0",
     "pino-pretty": "^13.1.2",
-    "yookassa": "^0.1.1"
+    "yookassa-ts": "^0.1.14"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",

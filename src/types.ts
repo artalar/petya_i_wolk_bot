@@ -38,21 +38,25 @@ export interface MenuCategory {
   items: MenuItem[];
 }
 
-// Session data to track the current order being built
+export type PaymentMethod = 'cash' | 'online';
+
+export interface CurrentOrder {
+  step: number;
+  messageId?: number;
+  categoryName?: string;
+  itemCode?: string;
+  volume?: string;
+  milk?: string;
+  syrup?: string;
+  additions: string[];
+  price: number;
+  paymentMethod?: PaymentMethod;
+  paymentId?: string;
+  paymentUrl?: string;
+  orderId?: number;
+}
+
 export interface SessionData {
-  currentOrder?: {
-    step: number;
-    messageId?: number;
-    categoryName?: string; // To display branch name before item selection
-    itemCode?: string; // temporary storage for selected item type
-    volume?: string;
-    milk?: string;
-    syrup?: string;
-    additions: string[];
-    price: number;
-    paymentId?: string;
-    paymentUrl?: string;
-  };
-  // To prevent spamming commands
+  currentOrder?: CurrentOrder;
   lastCommand?: number;
 }
