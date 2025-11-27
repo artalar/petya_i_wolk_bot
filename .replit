@@ -41,7 +41,8 @@ outputType = "console"
 [deployment]
 build = ["npm", "run", "build"]
 run = ["npm", "run", "start"]
-deploymentTarget = "vm"
+deploymentTarget = "gce"
+ignorePorts = true
 
 [[ports]]
 localPort = 3000
