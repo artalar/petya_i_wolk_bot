@@ -68,6 +68,29 @@ bot.on('callback_query:data', async (ctx, next) => {
 });
 bot.on('callback_query:data', handleOrderCallback);
 
+// Handle text messages as comments for steps 2-8
+bot.on('message:text', async (ctx) => {
+  const order = ctx.session.currentOrder;
+  if (!order) return;
+  
+  if (order.step >= 2 && order.step <= 8) {
+    const commentText = ctx.message.text;
+    if (!order.comments) {
+      order.comments = [];
+    }
+    order.comments.push(commentText);
+    
+    try {
+      await ctx.deleteMessage();
+    } catch {
+      // Ignore if can't delete
+    }
+    
+    const { updateOrderMessage } = await import('./orderFlow.js');
+    await updateOrderMessage(ctx);
+  }
+});
+
 // Error handling
 bot.catch((err) => {
   const ctx = err.ctx;

@@ -64,6 +64,7 @@ export interface CurrentOrder {
   paymentId?: string;
   paymentUrl?: string;
   orderId?: number;
+  comments?: string[];
 }
 
 export interface SessionData {

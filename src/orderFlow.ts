@@ -60,6 +60,13 @@ export function buildOrderSummary(order: CurrentOrder): string {
 
   summary += `⏰ Готовность: в течение 5 минут\n`;
 
+  if (order.comments && order.comments.length > 0) {
+    summary += `\n💬 *Комментарии:*\n`;
+    order.comments.forEach((comment) => {
+      summary += `• ${comment}\n`;
+    });
+  }
+
   const total = getTotalPrice(order);
   if (total > 0) summary += `\n💰 *Итого: ${total}₽*`;
   return summary;
@@ -165,11 +172,17 @@ export async function updateOrderMessage(ctx: Context, isNew = false) {
       break;
   }
 
+  const commentHint = "\n\nНам можно написать комментарий к заказу в сообщении 😉";
+  
   let fullText = summary;
   if (summary && stepMessage) {
     fullText += "\n\n\n" + stepMessage;
   } else {
     fullText += stepMessage;
+  }
+
+  if (order.step >= 2 && order.step <= 8) {
+    fullText += commentHint;
   }
 
   if (isNew) {
