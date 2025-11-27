@@ -1,12 +1,22 @@
 {
 	"orderMessageId": 139,
 	"currentOrder": {
-		"step": 8,
+		"step": 9,
 		"additions": [],
-		"price": 150,
-		"messageId": 473,
+		"price": 0,
+		"items": [
+			{
+				"itemCode": "espresso",
+				"volume": "0.042",
+				"additions": [],
+				"price": 150
+			}
+		],
+		"messageId": 478,
 		"categoryName": "Черный кофе",
-		"itemCode": "espresso",
-		"volume": "0.042"
+		"volume": "0.042",
+		"paymentMethod": "online",
+		"paymentId": "30ba6013-000f-5000-b000-1003b6675a39",
+		"paymentUrl": "https://yoomoney.ru/checkout/payments/v2/contract?orderId=30ba6013-000f-5000-b000-1003b6675a39"
 	}
 }
