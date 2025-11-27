@@ -14,6 +14,8 @@ This is a Telegram bot for ordering coffee and drinks, built with Grammy.dev (Te
 - Order tracking and notifications to admin group
 - Session management with file-based storage
 
+The main features list and specification detailes stored in [SPECIFICATION.md](./SPECIFICATION.md)!
+
 ## Project Structure
 ```
 ├── src/

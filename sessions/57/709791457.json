@@ -1,10 +1,12 @@
 {
 	"orderMessageId": 139,
 	"currentOrder": {
-		"step": 2,
+		"step": 8,
 		"additions": [],
-		"price": 0,
-		"messageId": 463,
-		"categoryName": "Черный кофе"
+		"price": 150,
+		"messageId": 473,
+		"categoryName": "Черный кофе",
+		"itemCode": "espresso",
+		"volume": "0.042"
 	}
 }
