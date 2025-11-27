@@ -40,6 +40,15 @@ export interface MenuCategory {
 
 export type PaymentMethod = 'cash' | 'online';
 
+export interface OrderedItem {
+  itemCode: string;
+  volume?: string;
+  milk?: string;
+  syrup?: string;
+  additions: string[];
+  price: number;
+}
+
 export interface CurrentOrder {
   step: number;
   messageId?: number;
@@ -50,6 +59,7 @@ export interface CurrentOrder {
   syrup?: string;
   additions: string[];
   price: number;
+  items: OrderedItem[];
   paymentMethod?: PaymentMethod;
   paymentId?: string;
   paymentUrl?: string;
