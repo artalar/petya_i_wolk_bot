@@ -12,7 +12,13 @@ export function findItem(id: string): MenuItem | undefined {
   return undefined;
 }
 
-function formatSingleItem(itemCode: string, volume?: string, milk?: string, syrup?: string, price?: number): string {
+function formatSingleItem(
+  itemCode: string,
+  volume?: string,
+  milk?: string,
+  syrup?: string,
+  price?: number,
+): string {
   const item = findItem(itemCode);
   let text = `☕️ ${item?.name}`;
   if (volume) text += ` (${Number(volume) * 1000}мл)`;
@@ -32,7 +38,9 @@ export function buildOrderSummary(order: CurrentOrder): string {
   const items = order.items || [];
   if (order.step === 1 && items.length === 0) return "";
 
-  let summary = order.orderId ? `📋 *Ваш заказ #${order.orderId}:*\n` : "📋 *Ваш заказ:*\n";
+  let summary = order.orderId
+    ? `📋 *Ваш заказ #${order.orderId}:*\n`
+    : "📋 *Ваш заказ:*\n";
 
   items.forEach((item, index) => {
     summary += `${index + 1}. ${formatSingleItem(item.itemCode, item.volume, item.milk, item.syrup, item.price)}\n`;
@@ -46,12 +54,12 @@ export function buildOrderSummary(order: CurrentOrder): string {
     summary += "\n";
     if (order.milk) summary += `   🥛 Молоко: ${order.milk}\n`;
     if (order.syrup) summary += `   🍬 Сироп: ${order.syrup}\n`;
-  } else if (order.categoryName && order.step > 1) {
+  } else if (order.categoryName && order.step > 1 && order.step < 8) {
     summary += `📂 ${order.categoryName}\n`;
   }
 
   summary += `⏰ Готовность: в течение 5 минут\n`;
-  
+
   const total = getTotalPrice(order);
   if (total > 0) summary += `\n💰 *Итого: ${total}₽*`;
   return summary;
