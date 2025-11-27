@@ -95,6 +95,14 @@ This bot is currently running in development mode on Replit. For production depl
 3. Bot webhook is properly configured (if using webhooks instead of polling)
 
 ## Recent Changes
+- **November 27, 2025**: Added order comments feature
+  - Users can leave comments by sending any message on steps 2-8
+  - Hint text "Нам можно написать комментарий к заказу в сообщении 😉" appears on steps 2-8
+  - Comments are displayed in order summary with 💬 section
+  - Supports all message types (text, stickers, photos, voice, video, documents, audio)
+  - Comments are sent to admin group with order notification
+  - User messages are automatically deleted after being saved as comments
+
 - **November 27, 2025**: Added multi-item order support
   - Added "Add another drink" button on payment selection step
   - Users can now add multiple drinks to a single order

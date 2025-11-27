@@ -6,6 +6,9 @@
 		"price": 0,
 		"items": [],
 		"messageId": 488,
-		"categoryName": "Черный кофе"
+		"categoryName": "Черный кофе",
+		"comments": [
+			"сделай вкусно"
+		]
 	}
 }
