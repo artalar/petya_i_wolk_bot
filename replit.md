@@ -95,6 +95,13 @@ This bot is currently running in development mode on Replit. For production depl
 3. Bot webhook is properly configured (if using webhooks instead of polling)
 
 ## Recent Changes
+- **November 27, 2025**: Added multi-item order support
+  - Added "Add another drink" button on payment selection step
+  - Users can now add multiple drinks to a single order
+  - Order summary displays all items with prices
+  - Total price calculated across all items
+  - Compatible with existing sessions (defensive initialization)
+
 - **November 27, 2025**: Imported from GitHub and configured for Replit environment
   - Installed all dependencies
   - Configured environment variables and secrets
