@@ -32,7 +32,7 @@ export function buildOrderSummary(order: CurrentOrder): string {
   const items = order.items || [];
   if (order.step === 1 && items.length === 0) return "";
 
-  let summary = "📋 *Ваш заказ:*\n";
+  let summary = order.orderId ? `📋 *Ваш заказ #${order.orderId}:*\n` : "📋 *Ваш заказ:*\n";
 
   items.forEach((item, index) => {
     summary += `${index + 1}. ${formatSingleItem(item.itemCode, item.volume, item.milk, item.syrup, item.price)}\n`;
@@ -153,7 +153,7 @@ export async function updateOrderMessage(ctx: Context, isNew = false) {
     }
 
     case 10:
-      stepMessage = `Супер! Ждем 👍\n\n🔢 Номер вашего заказа: #${order.orderId}`;
+      stepMessage = "Супер! Ждем 👍";
       break;
   }
 
