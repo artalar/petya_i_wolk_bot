@@ -12,24 +12,48 @@ export function findItem(id: string): MenuItem | undefined {
   return undefined;
 }
 
+function formatSingleItem(itemCode: string, volume?: string, milk?: string, syrup?: string, price?: number): string {
+  const item = findItem(itemCode);
+  let text = `☕️ ${item?.name}`;
+  if (volume) text += ` (${Number(volume) * 1000}мл)`;
+  if (milk) text += ` + ${milk}`;
+  if (syrup) text += ` + ${syrup}`;
+  if (price) text += ` — ${price}₽`;
+  return text;
+}
+
+export function getTotalPrice(order: CurrentOrder): number {
+  const items = order.items || [];
+  const itemsTotal = items.reduce((sum, item) => sum + item.price, 0);
+  return itemsTotal + order.price;
+}
+
 export function buildOrderSummary(order: CurrentOrder): string {
-  if (order.step === 1) return "";
+  const items = order.items || [];
+  if (order.step === 1 && items.length === 0) return "";
 
   let summary = "📋 *Ваш заказ:*\n";
 
+  items.forEach((item, index) => {
+    summary += `${index + 1}. ${formatSingleItem(item.itemCode, item.volume, item.milk, item.syrup, item.price)}\n`;
+  });
+
   if (order.itemCode) {
+    const itemNum = items.length + 1;
     const item = findItem(order.itemCode);
-    summary += `☕️ ${item?.name}`;
+    summary += `${itemNum}. ☕️ ${item?.name}`;
     if (order.volume) summary += ` (${Number(order.volume) * 1000}мл)`;
     summary += "\n";
-  } else if (order.categoryName) {
+    if (order.milk) summary += `   🥛 Молоко: ${order.milk}\n`;
+    if (order.syrup) summary += `   🍬 Сироп: ${order.syrup}\n`;
+  } else if (order.categoryName && order.step > 1) {
     summary += `📂 ${order.categoryName}\n`;
   }
 
-  if (order.milk) summary += `🥛 Молоко: ${order.milk}\n`;
-  if (order.syrup) summary += `🍬 Сироп: ${order.syrup}\n`;
   summary += `⏰ Готовность: в течение 5 минут\n`;
-  if (order.price > 0) summary += `\n💰 *Итого: ${order.price}₽*`;
+  
+  const total = getTotalPrice(order);
+  if (total > 0) summary += `\n💰 *Итого: ${total}₽*`;
   return summary;
 }
 
@@ -43,7 +67,11 @@ export async function updateOrderMessage(ctx: Context, isNew = false) {
 
   switch (order.step) {
     case 1:
-      stepMessage = "Привет! 🙌 Что вам приготовить?";
+      if ((order.items || []).length > 0) {
+        stepMessage = "Отлично! Что еще добавим?";
+      } else {
+        stepMessage = "Привет! 🙌 Что вам приготовить?";
+      }
       keyboard.text("Черный кофе", "cat_black").row();
       keyboard.text("Молочный кофе", "cat_milk").row();
       keyboard.text("Чай 0,3", "cat_tea");
@@ -101,6 +129,7 @@ export async function updateOrderMessage(ctx: Context, isNew = false) {
 
     case 8: {
       stepMessage = "Чудесно! Как будете оплачивать заказ?";
+      keyboard.text("➕ Добавить еще напиток", "add_more").row();
       keyboard.text("Оплатить на кассе", "pay_cash").row();
 
       const settings = await getSettings();
@@ -158,6 +187,7 @@ export async function startOrder(ctx: Context) {
     step: 1,
     additions: [],
     price: 0,
+    items: [],
   };
   await updateOrderMessage(ctx, true);
 }

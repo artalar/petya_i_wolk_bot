@@ -9,6 +9,7 @@ import {
   findItem,
   buildOrderSummary,
   updateOrderMessage,
+  getTotalPrice,
 } from "./orderFlow.js";
 
 export async function handleOrderCallback(ctx: Context) {
@@ -160,14 +161,61 @@ export async function handleOrderCallback(ctx: Context) {
       order.additions.push(`Сироп ${syrup}`);
     }
     order.step = 8;
+  } else if (data === "add_more") {
+    if (!order.items) order.items = [];
+    if (order.itemCode) {
+      order.items.push({
+        itemCode: order.itemCode,
+        volume: order.volume,
+        milk: order.milk,
+        syrup: order.syrup,
+        additions: [...order.additions],
+        price: order.price,
+      });
+    }
+    order.itemCode = undefined;
+    order.categoryName = undefined;
+    order.volume = undefined;
+    order.milk = undefined;
+    order.syrup = undefined;
+    order.additions = [];
+    order.price = 0;
+    order.step = 1;
   } else if (data === "pay_cash") {
+    if (!order.items) order.items = [];
+    if (order.itemCode) {
+      order.items.push({
+        itemCode: order.itemCode,
+        volume: order.volume,
+        milk: order.milk,
+        syrup: order.syrup,
+        additions: [...order.additions],
+        price: order.price,
+      });
+      order.itemCode = undefined;
+      order.price = 0;
+    }
     order.paymentMethod = "cash";
     order.step = 10;
   } else if (data === "pay_online") {
+    if (!order.items) order.items = [];
+    if (order.itemCode) {
+      order.items.push({
+        itemCode: order.itemCode,
+        volume: order.volume,
+        milk: order.milk,
+        syrup: order.syrup,
+        additions: [...order.additions],
+        price: order.price,
+      });
+      order.itemCode = undefined;
+      order.price = 0;
+    }
     order.paymentMethod = "online";
 
+    const totalPrice = getTotalPrice(order);
     const payment = await createPayment(
-      order.price,
+      totalPrice,
       `Order from @${ctx.from?.username}`
     );
 
