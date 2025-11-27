@@ -73,7 +73,7 @@ bot.on('message', async (ctx) => {
   const order = ctx.session.currentOrder;
   if (!order) return;
   
-  if (order.step >= 2 && order.step <= 8) {
+  if (order.step >= 2 && order.step <= 8 && order.messageId) {
     let commentText = '';
     
     if (ctx.message.text) {
@@ -107,8 +107,99 @@ bot.on('message', async (ctx) => {
       // Ignore if can't delete
     }
     
-    const { updateOrderMessage } = await import('./orderFlow.js');
-    await updateOrderMessage(ctx);
+    const { buildOrderSummary, findItem } = await import('./orderFlow.js');
+    const { getSettings } = await import('./db.js');
+    const { InlineKeyboard } = await import('grammy');
+    const { MENU, SYRUPS, ALT_MILKS } = await import('./consts.js');
+    
+    let stepMessage = "";
+    const keyboard = new InlineKeyboard();
+    
+    switch (order.step) {
+      case 2:
+        stepMessage = "Отличный выбор! Какой именно?";
+        MENU.black_coffee.forEach((item) => {
+          keyboard.text(item.name, `item_${item.id}`).row();
+        });
+        keyboard.row().text("Назад", "back");
+        break;
+
+      case 3:
+        stepMessage = "Отличный выбор! Какой именно?";
+        MENU.milk_coffee.forEach((item) => {
+          keyboard.text(item.name, `item_${item.id}`).row();
+        });
+        keyboard.row().text("Назад", "back");
+        break;
+
+      case 4: {
+        stepMessage = "Отличный выбор! Теперь давайте определимся с объемом!";
+        const item = findItem(order.itemCode!);
+        if (item?.volumes) {
+          Object.keys(item.volumes).forEach((vol) => {
+            keyboard.text(`${vol} л`, `vol_${vol}`).row();
+          });
+        }
+        keyboard.row().text("Назад", "back");
+        break;
+      }
+
+      case 5:
+        stepMessage = "Отличный выбор! Какой именно?";
+        MENU.tea.forEach((item) => {
+          keyboard.text(item.name, `item_${item.id}`).row();
+        });
+        keyboard.row().text("Назад", "back");
+        break;
+
+      case 6:
+        stepMessage = "Может на альтернативном молоке?";
+        keyboard.text("Спасибо, не надо", "milk_none").row();
+        ALT_MILKS.forEach((m) => keyboard.text(m, `milk_${m}`).row());
+        keyboard.row().text("Назад", "back");
+        break;
+
+      case 7:
+        stepMessage = "А как насчет сиропа?";
+        keyboard.text("Спасибо, не надо", "syrup_none").row();
+        SYRUPS.forEach((s) => keyboard.text(s, `syrup_${s}`).row());
+        keyboard.row().text("Назад", "back");
+        break;
+
+      case 8: {
+        stepMessage = "Чудесно! Как будете оплачивать заказ?";
+        keyboard.text("➕ Добавить еще напиток", "add_more").row();
+        keyboard.text("Оплатить на кассе", "pay_cash").row();
+
+        const settings = await getSettings();
+        if (settings.isOnlinePaymentActive) {
+          keyboard.text("Оплатить онлайн", "pay_online").row();
+        }
+
+        keyboard.row().text("Назад", "back");
+        break;
+      }
+    }
+    
+    const summary = buildOrderSummary(order);
+    const commentHint = "\n\nНам можно написать комментарий к заказу в сообщении 😉";
+    
+    let fullText = summary;
+    if (summary && stepMessage) {
+      fullText += "\n\n\n" + stepMessage;
+    } else {
+      fullText += stepMessage;
+    }
+    fullText += commentHint;
+    
+    try {
+      await ctx.api.editMessageText(ctx.chat.id, order.messageId, fullText, {
+        reply_markup: keyboard,
+        parse_mode: "Markdown",
+      });
+    } catch {
+      // Ignore if can't edit
+    }
   }
 });
 

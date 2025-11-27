@@ -1,14 +1,17 @@
 {
 	"orderMessageId": 139,
 	"currentOrder": {
-		"step": 2,
+		"step": 8,
 		"additions": [],
-		"price": 0,
+		"price": 150,
 		"items": [],
-		"messageId": 488,
-		"categoryName": "Черный кофе",
+		"messageId": 492,
 		"comments": [
-			"сделай вкусно"
-		]
+			"проверочка",
+			"пупупу"
+		],
+		"categoryName": "Черный кофе",
+		"itemCode": "espresso",
+		"volume": "0.042"
 	}
 }
