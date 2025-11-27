@@ -20,7 +20,7 @@ export function buildOrderSummary(order: CurrentOrder): string {
   if (order.itemCode) {
     const item = findItem(order.itemCode);
     summary += `☕️ ${item?.name}`;
-    if (order.volume) summary += ` (${order.volume}л)`;
+    if (order.volume) summary += ` (${Number(order.volume) * 1000}мл)`;
     summary += "\n";
   } else if (order.categoryName) {
     summary += `📂 ${order.categoryName}\n`;
