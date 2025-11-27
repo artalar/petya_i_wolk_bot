@@ -68,13 +68,34 @@ bot.on('callback_query:data', async (ctx, next) => {
 });
 bot.on('callback_query:data', handleOrderCallback);
 
-// Handle text messages as comments for steps 2-8
-bot.on('message:text', async (ctx) => {
+// Handle any messages as comments for steps 2-8
+bot.on('message', async (ctx) => {
   const order = ctx.session.currentOrder;
   if (!order) return;
   
   if (order.step >= 2 && order.step <= 8) {
-    const commentText = ctx.message.text;
+    let commentText = '';
+    
+    if (ctx.message.text) {
+      commentText = ctx.message.text;
+    } else if (ctx.message.caption) {
+      commentText = ctx.message.caption;
+    } else if (ctx.message.sticker) {
+      commentText = '[Стикер]';
+    } else if (ctx.message.photo) {
+      commentText = '[Фото]';
+    } else if (ctx.message.voice) {
+      commentText = '[Голосовое сообщение]';
+    } else if (ctx.message.video) {
+      commentText = '[Видео]';
+    } else if (ctx.message.document) {
+      commentText = '[Документ]';
+    } else if (ctx.message.audio) {
+      commentText = '[Аудио]';
+    } else {
+      commentText = '[Сообщение]';
+    }
+    
     if (!order.comments) {
       order.comments = [];
     }

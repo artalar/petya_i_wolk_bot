@@ -1,10 +1,11 @@
 {
 	"orderMessageId": 139,
 	"currentOrder": {
-		"step": 1,
+		"step": 2,
 		"additions": [],
 		"price": 0,
 		"items": [],
-		"messageId": 486
+		"messageId": 488,
+		"categoryName": "Черный кофе"
 	}
 }
