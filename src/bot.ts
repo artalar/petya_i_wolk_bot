@@ -32,7 +32,7 @@ bot.use(async (ctx, next) => {
   logger.info({
     update_id: ctx.update.update_id,
     user: ctx.from?.id,
-    type: ctx.updateType,
+    type: ctx.update.message ? 'message' : ctx.update.callback_query ? 'callback_query' : 'other',
     duration: ms
   }, 'Update processed');
 });
@@ -97,11 +97,11 @@ bot.catch((err) => {
   logger.error({ err: err.error, update_id: ctx.update.update_id }, `Error while handling update ${ctx.update.update_id}:`);
   const e = err.error;
   if (e instanceof GrammyError) {
-    logger.error("Error in request:", e.description);
+    logger.error({ description: e.description }, "Error in request");
   } else if (e instanceof HttpError) {
-    logger.error("Could not contact Telegram:", e);
+    logger.error({ err: e }, "Could not contact Telegram");
   } else {
-    logger.error("Unknown error:", e);
+    logger.error({ err: e }, "Unknown error");
   }
 });
 

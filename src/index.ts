@@ -1,4 +1,3 @@
-import { Bot } from 'grammy';
 import { bot } from './bot.js';
 import { logger } from './logger.js';
 
