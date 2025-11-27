@@ -10,8 +10,7 @@
     "dev": "NODE_ENV=development tsx watch src/index.ts",
     "dev:test": "NODE_ENV=development tsx watch src/index.ts",
     "dev:prod": "NODE_ENV=production tsx watch src/index.ts",
-    "type-check": "tsc --noEmit",
-    "test:payment": "echo 'Use test cards from YOOKASSA_TEST_DATA.md' && npm run dev:test"
+    "type-check": "tsc --noEmit"
   },
   "keywords": [
     "telegram",
