@@ -127,7 +127,7 @@ export async function handleOrderCallback(ctx: Context) {
         order.step = 4;
       } else if (item.category === "tea") {
         order.volume = "0.3";
-        order.price = 180;
+        order.price = item.volumes?.["0.3"] || item.price || 200;
         order.step = 8;
       }
     }
